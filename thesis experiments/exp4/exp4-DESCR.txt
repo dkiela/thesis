@@ -1,0 +1,11 @@
+In these experiments, the excitatory conductance value was fixed and trials were run with a varying ISYN (100 trials, between 0.0 and 1.0) and either with
+learning on (stimulating X for 2 seconds and Y for 1 second out of 2) or learning off (only stimulating X for 2 seconds).
+
+The chosen ESYN values were: 0.08 and 0.058, because these showed the most promise.
+
+0.08 was used with ENDSIM=2 and in the learning case ENDSIM/2
+0.058 was used with ENDSIM=5 and learning ENDSIM/2=2 (no float)
+
+Furthermore, 0.058 was repeated, but with identical firing rates (20,20 as opposed to 20,30) in the two stimuli
+
+An experiment like exp3 should be repeated for the learning case, this will be done later, and perhaps only on a more "full-fledged" network.

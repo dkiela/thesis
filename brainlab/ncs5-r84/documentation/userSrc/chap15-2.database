@@ -1,0 +1,32 @@
+<P><U>1. Voltage Report</P></U>
+Report Keyword: VOLTAGE<BR>
+Sample:<BR>
+0  -60.0000 -60.0000 -60.0000 -60.0000 -60.0000 -60.0000 -60.0000 -60.0000 -60.0000 -60.0000<BR>
+1  -61.3750 -61.3750 -61.3750 -61.3750 -61.3750 -61.3750 -61.3750 -61.3750 -61.3750 -61.3750<BR>
+2  -62.6876 -62.6876 -62.6876 -62.6876 -62.6876 -62.6876 -62.6876 -62.6876 -62.6876 -62.6876<BR>
+..  ...<BR>
+..  ...<BR>
+Description: First column represents simulation time tick. Remaining columns are membrane voltages of a neuron (cell) for corresponding time tick.<BR><BR>
+
+<P><U>2. Fire Count Report</P></U>
+Report Keyword: FIRE_COUNT<BR>
+Sample:<BR>
+0  0<BR>
+1  5<BR>
+2  12<BR>
+..  ..<BR>
+..  ..<BR>
+Description: First column represents simulation time tick. Second column gives a count of cells that fired at corresponding time tick.<BR><BR>
+
+<P><U>3. Synapse USE Report</P></U>
+Report Keyword: SYNAPSE_USE<BR>
+Sample:<BR>
+-1  0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000 0.0000<BR>
+0  0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 0.5000<BR>
+1  0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 0.5000 0.5000<BR>
+..  ..<BR>
+..  ..<BR>
+Description: First row is a kind of header row which gives index of the post-synaptic cell. The very first value, -1, is just a place holder and can be ignored.<BR>
+Actual synapse USE values are present from second row onwards. First column (second row onwards) represents simulation time tick. Remaining columns give corresponding synapse USE value for each cell index in first header row.<BR><BR>
+<->
+<->

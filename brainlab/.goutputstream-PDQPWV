@@ -1,0 +1,12 @@
+import brain
+import brainlab
+import brainsim
+import numpy
+import scipy
+import matplotlib
+
+parameters = {'ESYN_MAXCONDUCTANCE':['0.05'],'ISYN_MAXCONDUCTANCE':['0.4'],'CONN_LATERAL':0.02,'CONN_INTERNAL':0.02,'ENDSIM':2,'FSV':10000,'BRAINNAME':"vb-exp1"}
+
+brainsim.simBrain(parameters)
+listX = brainsim.loadBrain(parameters[BBRAINNAME']+'-XReport.txt')
+listY = brainsim.loadBrain(parameters['BRAINNAME']+'-YReport.txt')

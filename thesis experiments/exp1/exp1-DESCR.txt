@@ -1,0 +1,56 @@
+Number of trials for every run: 100
+Settings:
+
+i=float(0)
+trials=100
+while i < trials:
+        parameters['CONN_INTERNAL']=i/trials
+        parameters['CONN_LATERAL']=i/trials
+        parameters['ESYN_MAXCONDUCTANCE']=i/(trials*10)
+        parameters['ISYN_MAXCONDUCTANCE']=i/trials
+        parameters['TAU_NOISE']=(trials-i)/trials
+
+The names of the plots describe what was turned on or off.
+
+These settings were chosen rather arbitrarily, TAU_NOISE was made to increase in the (vain) hope of getting more fine-grained results with decreasing noise.
+
+The ESYN conductance is divided by another 10 because of the normally assumed ratio's between ESYN and ISYN. An additional run was done without the extra division, but this yielded no noticeable difference.
+
+When the CONN_* values were not changed, they were set to 1.0
+
+What we can see from the graphs is that the factor that has a large impact on correlations is TAU_NOISE. The distribution appears arbitrary.
+
+What we can also see is that even for runs with completely identical settings, the results may be different. Probably, this is due to the noise being injected in a random manner. This does make it harder to get to conclusive results.
+
+Apart from that, the most interesting points on all graphs are the ones where the correlation actually decreases and the phase shift increases, because apart from that nothing seems to happen in the graphs where TAU_NOISE stays equal.
+
+I've noticed that in these instances, the signal.correlate() function returns an array of correlates. The script picks the highest correlate via argmax(), and plots that. On occasions where the correlation stays equal, the result from signal.correlate is always just one single value, as opposed to an array.
+
+A further analysis of this behavior is troubled by the fact that these moments appear to occur randomly, as is shown by repeatied consecutive runs with exactly the same settings, which yielded entirely different results.
+
+Using this arbitrary approach, 
+
+However, because the two runs do indicate phase-shift differences in the same area (between runs 20 and 40), an analysis of more fine-grained values in this range has also been performed, using:
+
+i=float(0)
+trials=100
+esynval=20.0/1000 # since i=20/i=40 and we use i/1000 in the prev. exp.'s
+isynval=20.0/100
+while i < trials:
+        parameters['ESYN_MAXCONDUCTANCE']=esynval
+        parameters['ISYN_MAXCONDUCTANCE']=isynval
+	# we want to have 100 trials between 20/1000 and 40/1000,
+	# so there is a difference of (20/1000)/100 and (20/100)/100
+	# respectively.
+        esynval=esynval+(20.0/100)
+        isynval=isynval+(20.0/100)
+
+This yielded no results. In fact, the correlation and phase shift stayed identical throughout the run.
+
+To further analyze these results and to look more closely at any possible interrelation between ESYN and ISYN conductances ceteris paribus, the same experiment was performed, but now with esynval increasing and isynval decreasing, in the hope of finding points where the two coincide to affect the phase. This yielded the results shown in the appropriate graph, which did not provide any new data either.
+
+In a final overnight run, the experiment was repeated from 0.0 to 1.0 for ESYN and from 1.0 to 0.0 for ISYN, with 1000 trials and ENDSIM of 5, with Hebbian on for 5.
+
+To reproduce, move test-sync1.py and brainsim.py to the same folder as Brainlab, tweak values accordingly and execute:
+
+$ python test-sync1.py

@@ -1,0 +1,5 @@
+In this series of experiments, I looked at two neurons X and Y, where X is continuously stimulated and we look at the correlation between the spike trains produced by X and Y.
+
+At first, I did a trial where the ESYN value varies between 0.0 and 1.0, with 100 trials. This let to a prediction that correlation is highest between 0.01 and 0.05 so another experiment was performed, now looking at a more fine-grained picture, with 500 trials and ESYN values between 0.0 and 0.5.
+
+In order to exclude the possibility that setting the ISYN value has an impact on NCS performance, an experiment with 20 trial runs was used, once with ISYN=0 and once with ISYN=1. The plots show this had no effect.

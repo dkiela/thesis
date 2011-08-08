@@ -1,0 +1,99 @@
+# From fresh Ubuntu 10.10 install
+sudo apt-get install subversion
+
+cd ~
+svn co https://brainlab.svn.sourceforge.net/svnroot/brainlab brainlab
+cd brainlab
+tar xvzf ncs*
+
+# Install MPI libs and required dependencies for NCS
+sudo apt-get install bison mpich-bin libmpich-mpd1.0-dev libmpich-shmem1.0-dev mpich2 mpichpython flex g++
+
+cd ~/brainlab/ncs5-r84
+
+# apt-get installed mpicxx in /usr/bin, so in the Makefile we set:
+#
+#	ifeq ($(SYSTEM),local)
+#	   MPI = /usr
+#	  NAME = ncs5pe
+#	endif
+#
+
+# Also, make sure the following is set:
+# 	SYSTEM = local
+
+# If on AMD64 system, remove/adjust CFLAGS
+
+make
+cd ~/brainlab
+nano .brainlabrc
+
+# Add the following:
+# 	remoteexec=False
+# 	mcmd='/usr/bin/mpirun'
+# 	nolocal=False
+# 	remdir='./'
+
+ln -s ncs5-r84/ncs5pe .
+
+# Install dependencies for Brainlab
+#sudo apt-get install python-scipy python-pyx python-setuptools python-wxversion libpng-dev libfreetype6-dev
+# OR:
+
+sudo apt-get build-dep python-matplotlib python-scipy python-scipy
+sudo apt-get install python-matplotlib python-scipy python-opengl python-pyx
+
+# N.B. The following does not seem to be necessary anymore:
+# Easy_install matplotlib to ensure compatability.
+# Note that the normal command:
+#	sudo easy_install -U matplotlib
+# Doesn't work because of dependency issues.
+# Instead, run:
+#sudo easy_install http://location/of/latest/matplotlib.tar.gz
+#sudo easy_install -U numpy
+#sudo easy_install -U scipy
+# (not sure if this is necessary)
+
+# Run the testsuite
+python testsuite.py
+# if you get any errors, fix them.
+
+# before you can do "import brainlab" and "import brain", you need to add the brainlab folder to your path in every simulation, in my case:
+# 	import sys
+# 	sys.path.append('/home/virtus/brainlab')
+# alternatively, you can run your script directly from that folder
+
+# Now make sure MPD is running
+touch ~/.mpd.conf
+chmod 600 ~/.mpd.conf
+echo "MPD_SECRETWORD=blabla" > ~/.mpd.conf
+mpd &
+
+# Verify that the host is set properly
+mpdtrace
+# (the hostname that this outputs should be put into:
+# /usr/lib/mpich/share/machines.LINUX)
+
+# Verify that it executes commands
+mpiexec -n 1 /bin/hostname
+# (this should print your hostname)
+
+# Now, we need to edit ~/brainlab/brainlab.py to fix the command execution
+# change the appropriate line where the command is executed to this:
+#
+#    machfile="/usr/lib/mpich/share/machines.LINUX"
+#
+#    ncmd="cd "+tmpdir+"; "+mcmd+" -machinefile "+machfile+" "+nlcl+\
+#    " -np "+`nprocs`+" "+ncscmd+" "+\
+#    brainname+".in -d ./"   # end quote after I/O redir
+#
+# Also, set the appriate values at the top, if necessary
+
+# Then, all you need is IPSC.txt and ESPC.txt and put them in your
+# home directory.
+
+# It is possible that you get a segmentation fault when making reports. This is due to
+# linker/dependency inconsistencies. The segfault is caused by:
+# __cxa_allocate_exception from libstdc++.so.6
+# The solution is as follows (in .bashrc or before executing the command):
+export LD_PRELOAD=/usr/lib/libstdc++.so.6

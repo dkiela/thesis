@@ -1,0 +1,101 @@
+<->
+STIMULUS<,>N/A<,>Indicates the beginning of a stimulus definition section<;>
+TYPE<,>name (string)<,>The name which will be used to refer to this object<;>
+MODE<,>name (string)<,>The mode of the stimulus. Choices are: <BR><BR>
+CURRENT which declares the stimulus as a current (I)<BR>
+VOLTAGE which declares the stimulus as a voltage (V)<BR><;>
+PATTERN<,>name (string)<,>The type of stimulus: <A HREF="stimFileInput.html">FILE_BASED, INPUT (i.e. over sockets )</A>, SINE, LINEAR, PULSE, NOISE, FILE_BASED_DIRECT<;>
+FILENAME<,>name (string)<,>For file based stimulus, the name of source file<BR>For input stimulus, the location of the server (e.g. cortex.cs.unr.edu) <;>
+PORT<,>integer<,>The socket port used for input stimulus that NCS will receive stimulus data<;>
+TIME_INCREMENT<,>time (real)<,>The time value is used in setting up firing windows; it is the amount of real time each timestep corresponds to.<;>
+FREQ_ROWS<,>value (integer)<,><B>Deprecated.</B> The number of frequencies bins (Each frequency will actually be a <em>column</em> in the stimulus file.  The reason the keyword is FREQ_ROWS is because originally the frequencies were laid out as rows.  The stimulus file has since been rotated 90 degrees so that the number of rows now corresponds to the number of timesteps the stimulus file will cover. ) This has been succeeded by new keyword - FREQ_COLS.<;>
+FREQ_COLS<,>value (integer)<,>The number of frequencies bins (Each frequency will actually be a <em>column</em> in the stimulus file.<;>
+CELLS_PER_FREQ<,>value (integer)<,>The number of cells assigned to each frequency bin (Recall that the frequencies are the number of columns in the input file)<;>
+DYN_RANGE<,>min (real) max (real)<,>The minimum and maximum firing rates of the cells given in Hertz<;>
+TIMING<,>name (string)<,>values available are:(Not currently used by NCS)<BR><BR>
+ EXACT<BR>
+ URAND<BR>
+ POISSON<;>
+SAMESEED<,>YES/NO<,>Not currently used by NCS<;>
+AMP_START<,>value (real)<,>The starting amplitude of a stimulus<;>
+AMP_END<,>value (real)<,>When certain stimulus types finish, they will have this final amplitude value.<;>
+PHASE<,>value (real)<,>For SINE stimulus, this specifies the starting angle is an angle other than zero (0) is desired<;>
+VERT_TRANS<,>value (real)<,>For SINE stimulus, this is a vertical translation of the sine wave<;>
+WIDTH<,>value (real)<,>For PULSE stimulus, the WIDTH determines the length of time the pulse lasts.  This is given in secondes, uses <A HREF="chap1.html">FSV</A> to convert to timesteps<;>
+TIME_START<,>values+ (real)<,>The times when the stimulus should begin.  A stimulus may have multiple start and end times. <;>
+TIME_END<,>values+ (real)<,>The times when the stimulus should cease.  A stimulus may have multiple start and end times.<;>
+FREQ_START<,>value (real)<,>The starting Frequency of a stimulus.  Used to calculate how many pulses will exist which in turn is used to calculate the change in AMP over the course of execution<;>
+SEED<,>value (integer)<,>Random Number Generator Seed Value, This value should be a negative integer(ex. -999). This sets the independent seed to be used by the each stimulus object. This seed is used for the noise generator embedded within the stimulus block.<;>
+RATE<,>value (real)<,>for NOISE stimulus, mean firing rate of the Poisson noise in Hz.<;>
+TAU_NOISE<,>value (real)<,>for NOISE stimulus, mean time constant for correlation decaying(in second). If TAU_NOISE > 0, will generate inhomogeneous Poisson noise, otherwise, homogeneous.<;>
+CORREL<,>value (real)<,>for NOISE stimulus, correlation between randomly generated spikes. If CORREL > 0, will generate correlated noise, otherwise uncorrelated.<;>
+END_STIMULUS<,>N/A<,>Indicates the end of a stimulus definition section<;>
+<->
+STIMULUS
+        TYPE                    Stim_AI1
+        MODE                    CURRENT
+        PATTERN                 FILE_BASED
+        FILENAME                /home/jwk/bigThing/JM/JM_gasbombs_120x160_AI5.stm
+        TIME_INCREMENT          0.005
+        FREQ_COLS               1
+        CELLS_PER_FREQ          64
+        DYN_RANGE               1 77.3043
+        TIMING                  EXACT
+        SAMESEED                NO
+        AMP_START               10
+        AMP_END                 10
+        WIDTH                   0.001
+        TIME_START              0.2
+        TIME_END                1.8
+        FREQ_START              9999
+END_STIMULUS
+
+</PRE><P><U>FILE_BASED_DIRECT Example</P></U><PRE>
+FILE_BASED_DIRECT like FILE_BASED stimulus takes stimulus data from a file. But instead of having probabilities of firing, FILE_BASED_DIRECT
+stimulus file should actually have amplitude value for each time tick of stimulus duration, for each cell. For Eg. shown below,
+there should be 200 columns (corresponding to 200 cells) and 50 lines (corresponding to 50 time ticks) in stimulus file.
+(FSV * Stimlus duration = 2000 * 0.025 = 50).
+
+STIMULUS
+	TYPE			R2_Negstim_E1
+	MODE			CURRENT
+	PATTERN			FILE_BASED_DIRECT
+	FILENAME		/home/milindz/work/brain_model/stimulus/NegRampStim25ms_0.275nA_FSV2k.txt
+	FREQ_COLS		200
+	CELLS_PER_FREQ		1
+	TIMING			EXACT
+	TIME_START		0
+	TIME_END		0.025
+	FREQ_START		999999
+END_STIMULUS
+
+</PRE><P><U>NOISE Example</P></U><PRE>
+Currently, NOISE stimulus will only work under VOLTAGE mode.  This type of stimulus is used to generate various types of presynaptic trains 
+received by one/multi postsynaptic neuron.  Noise stimulus is able to produce (In)homogeneous (un)correlated Poisson spikes according to 
+certain correlation functions, by combining different value of TAU_NOISE and CORREL.
+
+
+The correlation funciton for inhomogeneous NOISE was given as: {a(t)b(t')} = r^2 + r^2*(sigma^2*delta + (1-delta)*Ca*Cb)*exp(-|t-t'|/tau)
+r is the average firing rate, sigma^2 is the global variation(sigma = 1, by default), delta = 1(a=b)/0(a!=b).  The interval of time is drawn 
+from exponential distribution with mean at TAU_NOISE. For every interal, N+1 random numbers, noise and Xa(a=1,2,...,N), were generated from 
+Gaussian distributions with zero mean and standard deviation sigma, respectively. At the start of each interval, the fring rate for synapse 
+a was set to: r(a) = r * (1 + (Xa + noise) * correl) (correl != 0); r * (1 + Xa) (correl == 0) and it was held at this value until the 
+start of next interval. 
+
+Since the firing rate is indepedent of time, the homogeneous Poisson process generates every sequence of N spikes over a fixed time interval 
+with equal probability.  As a result, the correlation function for homogeneous NOISE was given in a different way.  N0 independent 
+Poisson-distributed variables are generated and distributed among the N output variables, correlation of N0 and N follows: 
+N0 = N + sqrt(CORREL) * (1-N). If CORREL = 1, N0 = 1 (all output are identical as one random variable); If CORREL = 0, N0 = N (all output are 
+independent from each other). 
+   
+STIMULUS
+   TYPE                          Stim_AI0
+   MODE                          VOLTAGE
+   PATTERN                       NOISE
+   TIME_START                    0.000
+   TIME_END                      1.000
+   RATE                          10.0
+   TAU_NOISE                     0.020
+   CORREL                        0.0
+   SEED                         -11
+END_STIMULUS 

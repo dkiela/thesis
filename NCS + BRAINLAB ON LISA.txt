@@ -1,0 +1,25 @@
+LISA is the supercomputer run by SARA. See sara.nl. These instructions are for using the software on LISA.
+
+See the document BRAINLAB + NCS INSTALL for installing Brainlab and NCS.
+
+What is different, is that LISA does not use mpich, but openmpi. To compile NCS, make sure to do:
+
+module load openmpi
+module load c
+
+before compiling. When running NCS, make sure to execute:
+
+module load openmpi
+
+To get Brainlab to work, DO NOT run `module load python`, that standard python install is already good enough.
+However, you do need to install brian, and sympy in ${HOME}/pythonpackages by setting the correct parameters
+(through commandline) on setup.py and symlinking to these directories from the brainlab directory when the
+PYTHONPATH is not working properly.
+
+Create a jobscript for the simulation, setting the right PBS values, and execute using qsub.
+
+Note that NCS does not work properly on LISA. You need to severely tweak
+the Makefile, and even then it only works if the number of "clusters"
+(i.e., layers or similar) is equal to the amount of process nodes that you
+will use.
+

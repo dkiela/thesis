@@ -1,0 +1,68 @@
+import brainlab
+import pylab
+import numpy
+import netplot
+import matplotlib
+import brain
+#import scipy
+import random
+
+# General settings
+brainname="vb-exp1"
+endsim=2		# number of seconds the simulation runs (2)
+FSV=10000 		# simulation timesteps per second
+timesteps=FSV*endsim	# simulated brain time
+d=(0.0, endsim)		# duration for reports
+
+# Construct the BRAIN
+bradb=brainlab.BRAIN(simsecs=endsim, jobname=brainname, fsv = FSV)
+
+# Libraries
+bradb.SelectLib('standard')
+lib=bradb.libs['standard']
+syntypes=lib['syntypes']
+comptypes=lib['comptypes']
+celltypes=lib['celltypes']
+chantypes=lib['chantypes']
+synlearn=lib['sls']         #Hebb learning
+synfadep=lib['sfds']        #Facilitation - Depression
+synaug=lib['sas']           #Augmentation
+
+# Compartments
+comp=comptypes['SOMA1']
+comp.parms['TAU_MEMBRANE']=['0.020,0.0']       
+comp.parms['R_MEMBRANE']=['200,0.0']          # Membrane capacitance = 1 
+comp.parms['LEAK_CONDUCTANCE']=['0.00005,0.0']          
+comp.parms['LEAK_REVERSAL']=['-60,0.0']          
+comp.parms['THRESHOLD']=['-50,0.0']          
+comp.parms['VMREST']=['-60,0.0']
+
+# Synapses
+esyns=syntypes['E']
+isyns=syntypes['I']
+esyns.parms['ABSOLUTE_USE']=['0.250, 0.0']
+isyns.parms['ABSOLUTE_USE']=['0.250,0.0']
+esyns.parms['TYPE']='Excsyn'
+isyns.parms['TYPE']='Inhsyn'
+esyns.parms['MAX_CONDUCT']=['0.05']    #0.06
+isyns.parms['MAX_CONDUCT']=['0.4']      #0.35
+esyns.parms['SYN_REVERSAL']=['0,0']
+isyns.parms['SYN_REVERSAL']=['-80,0']
+esyns.parms['DELAY']=['0.0000000001,0.0000000001']  #Zirpe 2007
+isyns.parms['DELAY']=['0.0000000001,0.0000000001']
+esyns.parms['SFD']=['None']             #'Both' / 'None'
+isyns.parms['SFD']=['None']
+esyns.parms['LEARN_LABEL']=synlearn['BHebb']        #BHebb
+isyns.parms['LEARN_LABEL']=synlearn['BHebb']        #BHebb
+esyns.parms['HEBB_START']=['0'] # 50 ms 
+esyns.parms['HEBB_END']=['1']   #time in secs
+isyns.parms['HEBB_START']=['0']
+isyns.parms['HEBB_END']=['1']
+
+### Construct the actual cell, layer and column setup
+ecell=celltypes['E']
+icell=celltypes['I']
+
+x, y, w, h=(100, 200, 50, 80) # columns coordinates
+
+

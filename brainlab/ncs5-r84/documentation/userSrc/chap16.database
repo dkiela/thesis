@@ -1,0 +1,21 @@
+This section allows us to change a synapse's USE value. Effect of updated USE values can be seen on a post-synaptic cell group by using appropriate reports. Define multiple EVENT sections to change USE values many times over the course of simulation.
+<BR><BR>Sample File format for USE file to be uploaded:<BR>
+0	0	0	1	1	2	...<BR>
+.25	.19	.30	.25	.25	.40	...<BR>
+First row represents the post-synaptic cell index and second row specifies corresponding synapse USE value. This is similar to the format of SYNAPSE_USE report type.<BR>
+Note: The header can also be copied from a USE report file (of any duration, with any intial USE values).
+<->
+EVENT<,>N/A<,>Indicates the start of a Event definition section.<;>
+TYPE<,>name (string)<,>The name which is used to refer to this Event object.<;>
+USE_OVERRIDE<,>name (string) value (real)<,>Name indicates the file name which has the Synapse USE values to be loaded. Value is simulation time (in seconds) at which to load the Synapse USE values from file.<;>
+CELLS<,>Column (string) Layer (string) CellType (string) Compartment (string)<,>This indicates the post-synaptic cell group associated with the synapse under consideration.<;>
+SYNAPSE<,>name (string)<,>Name of the synapse whose USE values will be replaced by values loaded from file.<;>
+END_EVENT<,>N/A<,>Indicates the end of a Event definition section.<;>
+<->
+EVENT
+	TYPE		override
+	# Loading Synapse USE values at time instant 0.5 seconds during simulation.
+	USE_OVERRIDE	./input/EE1USE075.txt	0.500
+	CELLS		RAIN_miniColumn	layer23	E1	somaE
+	SYNAPSE	synEE
+END_EVENT

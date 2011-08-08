@@ -1,0 +1,65 @@
+import brain
+import brainlab
+import brainsim
+import numpy
+from numpy import pi
+import scipy
+from matplotlib import pyplot
+
+def showSpikePlotXY():
+	pyplot.subplot(211)
+	pyplot.title("Neuron X")
+	pyplot.plot(t,A)
+	pyplot.subplot(212)
+	pyplot.title("Neuron Y")
+	pyplot.plot(t,B)
+	pyplot.show()
+
+def showCorrPlot():
+	c = numpy.linspace(0.0, len(correlations), len(correlations), endpoint=False)
+	pyplot.plot(c, numpy.array(correlations).astype(float))
+	pyplot.show()
+
+def giveCorrelation():
+	xcorr = scipy.correlate(A, B)
+	return xcorr
+
+def givePhaseShift(xcorr):
+	period=1.0
+	dt = numpy.linspace(-t[-1], t[-1], 2*nsamples-1)
+	recovered_time_shift = dt[xcorr.argmax()]
+	recovered_phase_shift = 2*pi*(((0.5 + recovered_time_shift/period) % 1.0) - 0.5)
+	print 'Phase shift: ', recovered_phase_shift
+	print 'Correlation: ', xcorr
+	return recovered_phase_shift
+
+parameters = {
+	'ESYN_MAXCONDUCTANCE':0, #0.05 ['']
+	'ISYN_MAXCONDUCTANCE':0, #0.4
+	'CONN_LATERAL':0.02, #0.02
+	'CONN_INTERNAL':0.02, #0.02
+	'ENDSIM':2, 
+	'FSV':10000,
+	'BRAINNAME':"vb-exp1",
+	'TAU_NOISE':0.0} #0.020
+
+correlations=[]
+i=0
+trials=10
+while i < trials:
+	parameters['ESYN_MAXCONDUCTANCE']=i/10
+	brainsim.simBrain(parameters)
+	listX = brainsim.loadBrain(parameters['BRAINNAME']+'-XReport.txt')
+	listY = brainsim.loadBrain(parameters['BRAINNAME']+'-YReport.txt')
+	nsamples=len(listX)
+	t = numpy.linspace(0.0, parameters['ENDSIM'], nsamples, endpoint=False)
+	A=numpy.array(listX).astype(float)
+	B=numpy.array(listY).astype(float)
+	xcorr = giveCorrelation()
+	correlations.append(xcorr)
+	givePhaseShift(xcorr)
+	#showSpikePlotXY()
+	i=i+1
+
+print "Correlations:", correlations
+showCorrPlot()

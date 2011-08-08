@@ -1,0 +1,4 @@
+remoteexec=False
+mcmd='/usr/bin/mpirun'
+nolocal=False
+remdir='./'
